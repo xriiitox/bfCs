@@ -4,7 +4,7 @@ namespace bfCs;
 
 class Program
 {
-    static byte[] _arr = new byte[65536];
+    static byte[] _arr = new byte[30000];
     static int _pointer = 0;
     static string _program = "";
     public static void Main(string[] args)
@@ -49,14 +49,31 @@ class Program
                     break;
                 case ',':
                     var input = Console.ReadLine();
-                    while (string.IsNullOrEmpty(input))
+                    if (string.IsNullOrEmpty(input))
                     {
-                        input = Console.ReadLine();
+                        _arr[_pointer] = 0;  // Handle EOF by setting cell to 0
                     }
-                    _arr[_pointer] = Encoding.ASCII.GetBytes(input)[0];
+                    else
+                    {
+                        _arr[_pointer] = Encoding.ASCII.GetBytes(input)[0];
+                    }
                     break;
                 case '[':
-                    jumpBackIndices.Add(i);
+                    // If the current cell is 0, skip to the matching ]
+                    if (_arr[_pointer] == 0)
+                    {
+                        int openBrackets = 1;
+                        while (openBrackets > 0)
+                        {
+                            i++;
+                            if (_program[i] == '[') openBrackets++;
+                            if (_program[i] == ']') openBrackets--;
+                        }
+                    }
+                    else
+                    {
+                        jumpBackIndices.Add(i);
+                    }
                     break;
                 case ']':
                     if (_arr[_pointer] != 0)
