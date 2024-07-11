@@ -1,78 +1,74 @@
-﻿namespace bfCs;
+﻿using System.Text;
+
+namespace bfCs;
 
 class Program
 {
-    static byte[] _byteArr = new byte[30000];
+    static byte[] _arr = new byte[65536];
     static int _pointer = 0;
-    static readonly string _program = File.ReadAllText("./program.bf");
-    public static void Main()
+    static string _program = "";
+    public static void Main(string[] args)
     {
-         // store bracket indices
-        
+        _program = File.ReadAllText(args[0]).ReplaceLineEndings(String.Empty).Trim();
+
         RunCmd();
-
-
     }
 
     private static void RunCmd()
     {
-        var bracketPairLooping = 0; // integer to allow for nested loops
         var jumpBackIndices = new List<int>();
 
 
         for (int i = 0; i < _program.Length; i++)
         {
-            if (bracketPairLooping == 0)
+            switch (_program[i])
             {
-                switch (_program[i])
-                {
-                    case '>':
-                        _pointer = _pointer == 29999 ? 0 : _pointer + 1;
-                        break;
-                    case '<':
-                        _pointer = _pointer == 0 ? 29999 : _pointer - 1;
-                        break;
-                    case '+':
-                        _byteArr[_pointer]++; // wrapping is implemented in byte already
-                        break;
-                    case '-':
-                        _byteArr[_pointer]--;
-                        break;
-                    case '.':
-                        Console.Write(char.ConvertFromUtf32(_byteArr[_pointer]));
-                        break;
-                    case ',':
-                        _byteArr[_pointer] = Convert.ToByte(Console.ReadLine());
-                        break;
-                    case '[':
-                        bracketPairLooping++;
-                        jumpBackIndices.Add(i);
-                        break;
-                    case ']':
-                        if (_byteArr[_pointer] != 0)
-                        {
-                            i = jumpBackIndices.Last();
-                        }
-
-                        break;
-                    default:
-                        continue;
-                }
-            }
-            else
-            {
-                if (_program[i] == '[')
-                {
-                    bracketPairLooping++;
+                case '>':
+                    _pointer = _pointer == 29999 ? 0 : _pointer + 1;
+                    break;
+                case '<':
+                    _pointer = _pointer == 0 ? 29999 : _pointer - 1;
+                    break;
+                case '+':
+                    if (_arr[_pointer] == byte.MaxValue)
+                    { 
+                        _arr[_pointer] = 0;
+                    }
+                    _arr[_pointer]++;
+                    break;
+                case '-':
+                    if (_arr[_pointer] == byte.MinValue)
+                    {
+                        _arr[_pointer] = 255;
+                    }
+                    _arr[_pointer]--;
+                    break;
+                case '.':
+                    //char yeah = Encoding.ASCII.GetChars([_byteArr[_pointer]])[0];
+                    Console.Write(char.ConvertFromUtf32(_arr[_pointer]));
+                    break;
+                case ',':
+                    var input = Console.ReadLine();
+                    while (string.IsNullOrEmpty(input))
+                    {
+                        input = Console.ReadLine();
+                    }
+                    _arr[_pointer] = Encoding.ASCII.GetBytes(input)[0];
+                    break;
+                case '[':
                     jumpBackIndices.Add(i);
-                    continue;
-                }
+                    break;
+                case ']':
+                    if (_arr[_pointer] != 0)
+                    {
+                        i = jumpBackIndices.Last();
+                        break;
+                    }
+                    jumpBackIndices.RemoveAt(jumpBackIndices.Count - 1);
 
-                if (_program[i] == ']')
-                {
-                    bracketPairLooping--;
-                    i = jumpBackIndices.Last() + 1;
-                }
+                    break;
+                default:
+                    continue;
             }
         }
     }
