@@ -8,15 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Antlr4" Version="4.6.6">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
+      <None Update="program.bf">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
-
-    <ItemGroup>
-      <Content Include="Brainfuck.g4" />
-    </ItemGroup>
+    
+    
 
 </Project>
